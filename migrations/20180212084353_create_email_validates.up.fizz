@@ -1,0 +1,5 @@
+create_table("email_validates", func(t) {
+	t.Column("id", "uuid", {"primary": true})
+	t.Column("user_id", "uuid", {})
+	t.Column("token_hash", "string", {})
+})

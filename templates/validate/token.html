@@ -1,0 +1,6 @@
+</h1>
+
+<%= form_for(email_validate, {action: validateTokenPath(), method: "GET"}) { %>
+  <%= f.InputTag("token",{label: "Token received to validate email account"}) %>
+  <button class="btn btn-success">Validate your email!</button>
+<% } %>

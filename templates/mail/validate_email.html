@@ -1,0 +1,8 @@
+<h2>Thanks for subscribing</h2>
+<br />
+Thanks for subscribing to <%= HOST %> . Please validate your account using the following link:
+<br />
+<%= raw("<a href='" + genURL(HOST,validateTokenPath()) + genURLParam("token",token)+"' > " + genURL(HOST,validateTokenPath()) + " </a>") %>
+<br />
+If it doesn't work automatically here is the token you need to enter:
+<h3><%= token %></h3>

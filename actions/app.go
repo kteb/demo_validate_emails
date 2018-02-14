@@ -1,6 +1,8 @@
 package actions
 
 import (
+	"time"
+
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -16,6 +18,7 @@ import (
 // ENV is used to help switch settings based on where the
 // application is being run. Default is "development".
 var ENV = envy.Get("GO_ENV", "development")
+var HOST = envy.Get("HOST", "http://127.0.0.1:3000/")
 var app *buffalo.App
 var T *i18n.Translator
 
@@ -38,6 +41,16 @@ func App() *buffalo.App {
 			app.Use(middleware.ParameterLogger)
 		}
 
+		// custom middleware to display the current year
+		app.Use(func(next buffalo.Handler) buffalo.Handler {
+			return func(c buffalo.Context) error {
+				// TODO: depending on the var environement adapting the url
+				c.Set("HOST", HOST)
+				c.Set("year", time.Now().Year())
+				return next(c)
+			}
+		})
+
 		// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
 		// Remove to disable this.
 		app.Use(csrf.New)
@@ -57,6 +70,15 @@ func App() *buffalo.App {
 		app.GET("/", HomeHandler)
 
 		app.ServeFiles("/assets", assetsBox)
+		app.Use(SetCurrentUser)
+		app.Use(Authorize)
+		app.GET("/users/new", UsersNew)
+		app.POST("/users", UsersCreate)
+		app.GET("/signin", AuthNew)
+		app.POST("/signin", AuthCreate)
+		app.DELETE("/signout", AuthDestroy)
+		app.Middleware.Skip(Authorize, HomeHandler, UsersNew, UsersCreate, AuthNew, AuthCreate)
+		app.GET("/validate/token", ValidateToken)
 	}
 
 	return app
